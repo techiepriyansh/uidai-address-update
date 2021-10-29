@@ -1,6 +1,8 @@
 const { WebSocketServer } = require('ws');
 require('dotenv').config()
 
+const assert = require('assert');
+
 const { ResidentOperatorTransaction } = require('./resident_operator_transaction.js');
 const { splitMessage, MSG_DELIM } = require('./utils.js');
 
@@ -11,7 +13,9 @@ const wss = new WebSocketServer({
 let transactions = {};
 
 wss.on('connection', client => {
-	client.on('message', msg => {
+	client.on('message', rawMsg => {
+		let msg = rawMsg.toString();
+		console.log(msg)
 		let [cmd, arg] = splitMessage(msg);
 
 		switch (cmd) {
@@ -19,7 +23,7 @@ wss.on('connection', client => {
 				let uid = arg; // Aadhaar number
 				let transaction = new ResidentOperatorTransaction(client, uid);
 				transactions[transaction.token] = transaction;
-				client.send(`token${MSG_DELIM}${token}`);
+				client.send(`token${MSG_DELIM}${transaction.token}`);
 				break;
 			}
 
@@ -34,7 +38,7 @@ wss.on('connection', client => {
 				let token = cmd;
 				let transaction = transactions[token];
 
-				let [remCmd, remArg] = arg;
+				let [remCmd, remArg] = splitMessage(arg);
 				switch (remCmd) {
 					case 'authenticate_resident': {
 						assert.deepEqual(transaction.operator, client);
@@ -48,7 +52,7 @@ wss.on('connection', client => {
 						assert.deepEqual(transaction.operator, client);
 						transaction.uploadAddressData(remArg);
 						client.send(`upload_address_data${MSG_DELIM}true`);
-						transaction.resident.send(`address_data${MSG_DELIM}${remData}`)
+						transaction.resident.send(`address_data${MSG_DELIM}${remArg}`)
 						break;
 					}
 
@@ -56,6 +60,7 @@ wss.on('connection', client => {
 						assert.deepEqual(transaction.resident, client);
 						transaction.confirmResident();
 						// push the transaction address data to the relevant db
+						console.log(transaction.addressData);
 						client.send(`done${MSG_DELIM}true`);
 						delete transactions[token];
 						break;

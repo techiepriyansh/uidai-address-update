@@ -1,3 +1,4 @@
+const assert = require('assert');
 const randomstring = require('randomstring');
 
 const TOKEN_LENGTH = 32;

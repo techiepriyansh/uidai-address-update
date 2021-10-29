@@ -4,7 +4,8 @@
   "description": "",
   "main": "socket_server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node socket_server.js",
+    "test": "python3 tests/resident_app.py"
   },
   "repository": {
     "type": "git",
