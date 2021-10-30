@@ -5,7 +5,8 @@
   "main": "socket_server.js",
   "scripts": {
     "start": "node socket_server.js",
-    "test": "python3 tests/resident_app.py"
+    "test-socket": "python3 tests/resident_app.py",
+    "test-otpgen": "node tests/otpTest.js"
   },
   "repository": {
     "type": "git",
@@ -20,6 +21,13 @@
   "dependencies": {
     "dotenv": "^10.0.0",
     "randomstring": "^1.2.1",
-    "ws": "^8.2.3"
+    "ws": "^8.2.3",
+    "js2xmlparser": "^3.0.0",
+    "moment": "^2.18.1",
+    "node-aes-gcm": "^0.2.4",
+    "node-forge": "^0.7.1",
+    "pem": "^1.11.0",
+    "xml-crypto": "^0.10.1",
+    "xml2js": "^0.4.19"
   }
 }
