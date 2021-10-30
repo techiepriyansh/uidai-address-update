@@ -7,9 +7,6 @@ def on_message(ws, message):
 	cmd, arg = message.split("::")
 	if cmd == "new_operator":
 		assert arg == "true"
-		ws.send(token + r'::authenticate_resident::{"name": "someone"}')
-	elif cmd == "authenticate_resident":
-		assert arg == "true"
 		ws.send(token + r'::upload_address_data::{"orig": "177A Blecker Street", "new": "10880 Malibu"}')
 	elif cmd == "upload_address_data":
 		assert arg == "true"
@@ -23,7 +20,7 @@ def on_close(ws, close_status_code, close_msg):
 
 def on_open(ws):
 	global token
-	ws.send(f'new_operator::{token}')
+	ws.send(f'new_operator::{token}::yellowsubmarine')
 
 def operator_main(recvd_token):
 	global token

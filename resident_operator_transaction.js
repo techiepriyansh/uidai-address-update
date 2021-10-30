@@ -3,11 +3,10 @@ const randomstring = require('randomstring');
 
 const TOKEN_LENGTH = 32;
 
-const RESIDENT_CONNECTED             = 0;
-const OPERATOR_CONNECTED             = 1;
-const RESIDENT_AUTHENTICATED         = 2;
-const ADDRESS_DATA_UPLOADED          = 3;
-const RESIDENT_CONFIRMATION_OBTAINED = 4;
+const RESIDENT_CONNECTED              = 0;
+const OPERATOR_CONNECTED              = 1;
+const ADDRESS_DATA_UPLOADED           = 2;
+const RESIDENT_CONFIRMATION_OBTAINED  = 3;
 
 class ResidentOperatorTransaction 
 {
@@ -26,17 +25,9 @@ class ResidentOperatorTransaction
 		this.status = OPERATOR_CONNECTED;
 	}
 
-	authenticateResident(authData)
-	{
-		assert.equal(this.status, OPERATOR_CONNECTED);
-		// TODO: Aadhar API Authenticate
-		this.status = RESIDENT_AUTHENTICATED;
-		return true;
-	}
-
 	uploadAddressData(data)
 	{
-		assert.equal(this.status, RESIDENT_AUTHENTICATED);
+		assert.equal(this.status, OPERATOR_CONNECTED);
 		this.addressData = data;
 		this.status = ADDRESS_DATA_UPLOADED;
 	}

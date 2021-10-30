@@ -3,6 +3,7 @@ require('dotenv').config()
 
 const assert = require('assert');
 
+const { OtpAuth } = require('./otp_auth.js');
 const { ResidentOperatorTransaction } = require('./resident_operator_transaction.js');
 const { splitMessage, MSG_DELIM } = require('./utils.js');
 
@@ -10,6 +11,7 @@ const wss = new WebSocketServer({
 	port: process.env.SOCKET_PORT, 
 });
 
+let auths = {}
 let transactions = {};
 
 wss.on('connection', client => {
@@ -21,14 +23,32 @@ wss.on('connection', client => {
 		switch (cmd) {
 			case 'new_resident': { 
 				let uid = arg; // Aadhaar number
-				let transaction = new ResidentOperatorTransaction(client, uid);
-				transactions[transaction.token] = transaction;
-				client.send(`token${MSG_DELIM}${transaction.token}`);
+				let auth = new OtpAuth(uid);
+				auths[auth.txn] = auth;
+				auth.sendOtp(() => {
+					client.send(`txn${MSG_DELIM}${auth.txn}`);
+				});
+				break;
+			}
+
+			case 'auth_otp_resident': {
+				let [txn, otp] = splitMessage(arg);
+				let auth = auths[txn];
+				auth.verifyOtp(otp, (err, res) => {
+					if (res) {
+						let transaction = new ResidentOperatorTransaction(client, auth.uid);
+						transactions[transaction.token] = transaction;
+						client.send(`token${MSG_DELIM}${transaction.token}`);
+					} else {
+						client.send(`error${MSG_DELIM}authentication`);
+					}
+				})
 				break;
 			}
 
 			case 'new_operator': {
-				let token = arg;
+				let [token, operatorSecret] = splitMessage(arg);
+				// TODO: verify(operatorSecret)
 				transactions[token].connectOperator(client);
 				client.send(`new_operator${MSG_DELIM}true`);
 				break;
@@ -40,14 +60,6 @@ wss.on('connection', client => {
 
 				let [remCmd, remArg] = splitMessage(arg);
 				switch (remCmd) {
-					case 'authenticate_resident': {
-						assert.deepEqual(transaction.operator, client);
-						let authenticated = transaction.authenticateResident(remArg);
-						client.send(`authenticate_resident${MSG_DELIM}${authenticated}`);
-						if (!authenticated) delete transactions[token];
-						break;
-					}
-
 					case 'upload_address_data': {
 						assert.deepEqual(transaction.operator, client);
 						transaction.uploadAddressData(remArg);
