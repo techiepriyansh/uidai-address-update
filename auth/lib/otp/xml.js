@@ -15,7 +15,7 @@ let URL_HOST;
 let URL_PATHTEMPLATE;
 
 let OTP_XMLNS;
-const OTP_TS_ISO8601 = 'YYYY-MM-DDThh:mm:ss';
+const OTP_TS_ISO8601 = 'YYYY-MM-DDTHH:mm:ss';
 const TEST_AUA_CODE = 'public';
 const TEST_SUBAUA_CODE = TEST_AUA_CODE;
 const OTP_AUA_LICENSEKEY = constants.TEST_AUA_LICENSEKEY;

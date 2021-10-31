@@ -53,7 +53,7 @@ const DATA_TYPE = { XML: 'X', PROTOBUF: 'P' };
 const DATA_DEFAULT_TYPE = DATA_TYPE.XML;
 //PID
 let PID_DEFAULT_VER;
-const PID_TS_ISO8601 = 'YYYY-MM-DDThh:mm:ss';
+const PID_TS_ISO8601 = 'YYYY-MM-DDTHH:mm:ss';
 //DEMO
 const LANGUAGE_CODE = {
 	Assamese: '01',
